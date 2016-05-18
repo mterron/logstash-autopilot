@@ -23,7 +23,7 @@ until [ $n -ge 120 ]; do
 		n=$((n+2))
 	done
 	log "Consul is now available [${n}s], starting up Logstash"
-	su-exec logstash:logstash /opt/containerpilot/containerpilot /opt/logstash/bin/logstash agent -f /opt/logstash/config/logstash.conf
+	su-exec logstash:logstash /opt/containerpilot/containerpilot /opt/logstash/bin/logstash agent --allow-env -f /opt/logstash/config/logstash.conf
 done
 loge "Consul unavailable, aborting"
 exit 1

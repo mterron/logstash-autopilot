@@ -18,7 +18,7 @@ RUN echo http://dl-6.alpinelinux.org/alpine/v3.3/community >> /etc/apk/repositor
 # to reach this container in the default networking environment, but if we
 # leave this here then we get the ports as well-known environment variables
 # for purposes of linking.
-EXPOSE 3164 3164/udp 4000 5424 5424/udp 12201 25109
+EXPOSE 3164 3164/udp 5424 5424/udp 12201 24224 25109
 
 WORKDIR /tmp
 # Add Containerpilot and set its configuration path
@@ -39,7 +39,6 @@ RUN mkdir -p /opt && \
 	mv -f logstash-${LOGSTASH_VERSION}/ /opt/logstash &&\
 	rm -f logstash-${LOGSTASH_VERSION}.tar.gz
 
-# Create and take ownership over required directories
 # Copy internal CA certificate bundle.
 COPY ca.pem /etc/ssl/private/
 # Create and take ownership over required directories, update CA
