@@ -1,0 +1,122 @@
+version: "2"
+# Elasticsearch stack designed for container-native deployment
+# using the Autopilot pattern
+
+services:
+  # ---------------------------------------------------
+  # Consul as a service discovery tier
+  # Should point to the autopilot/consul docker image?
+  consul:
+    image: mterron/consul-autopilot
+    labels:
+      - triton.cns.services=consul
+    restart: always
+    mem_limit: 128m
+    ports:
+      - 53
+      - 8300
+      - 8301
+      - 8302
+      - 8400
+      - 8500
+      - 8501
+    env_file: _env_consul
+
+  # ---------------------------------------------------
+  # The logstash container is the target of Docker log drivers
+  logstash:
+    image: mterron/logstash-autopilot:latest
+    mem_limit: 256m
+    restart: always
+    labels:
+      - triton.cns.services=logstash
+    depends_on:
+      - consul
+    ports:
+      - 3164
+      - "3164/udp"
+      - 4000
+      - 5424
+      - "5424/udp"
+      - 12201
+      - 25109
+    dns:
+      - 172.18.0.2
+      - 172.18.0.3
+    dns_search:
+      - service.consul
+      - node.consul
+    env_file: _env
+
+  # ---------------------------------------------------
+  # This common service definition is the default for nodes that both store
+  # data and act as potential masternodes. It also serves as a template for
+  # master-only, data-only and client ES nodes.
+  elasticsearch:
+    image: mterron/elasticsearch-autopilot
+    labels:
+      - triton.cns.services=elasticsearch-master
+    mem_limit: 256m
+    restart: always
+    ulimits:
+        memlock: 9223372036854775807
+#    depends_on:
+#      - consul
+    dns:
+      - 172.18.0.2
+      - 172.18.0.3
+    dns_search:
+      - service.consul
+      - node.consul
+    env_file: _env
+    environment:
+      - ES_SERVICE_NAME=elasticsearch-master
+      - ES_NODE_MASTER=true
+      - ES_NODE_DATA=true
+
+
+  # ---------------------------------------------------
+  # The master-only node serves as the coordinator of the cluster only
+  elasticsearch_master:
+    extends:
+      service: elasticsearch
+    labels:
+      - triton.cns.services=elasticsearch-master
+    depends_on:
+      - consul
+    environment:
+      - ES_SERVICE_NAME=elasticsearch-master
+      - ES_NODE_MASTER=true
+      - ES_NODE_DATA=false
+
+  # ---------------------------------------------------
+  # Data nodes hold data and perform data related operations such as CRUD, 
+  # search, and aggregations.
+  elasticsearch_data:
+    extends:
+      service: elasticsearch
+    labels:
+      - triton.cns.services=elasticsearch-data
+    depends_on:
+      - elasticsearch_master
+    environment:
+      - ES_SERVICE_NAME=elasticsearch-data
+      - ES_NODE_MASTER=false
+      - ES_NODE_DATA=true
+
+  # ---------------------------------------------------
+  # Client nodes behaves as a “smart router” and is used to forward 
+  # cluster-level requests to the master node and data-related 
+  # requests (such as search) to the appropriate data nodes
+  elasticsearch_client:
+    extends:
+      service: elasticsearch
+    labels:
+      - triton.cns.services=elasticsearch-client
+    depends_on:
+      - elasticsearch_master
+    environment:
+      - ES_SERVICE_NAME=elasticsearch-client
+      - ES_NODE_MASTER=false
+      - ES_NODE_DATA=false
+

@@ -1,0 +1,16 @@
+ES_SERVICE_NAME=elasticsearch-master
+CLUSTER_NAME=elasticsearch
+
+ # set to 50% of mem_limit, but no more than 31g
+ES_HEAP_SIZE=2g
+
+
+ES_NODE_MASTER=true
+ES_NODE_DATA=true
+
+# set the number of threads we want based on the number of CPU shares
+# that we'll get for this size container on Triton
+ES_JAVA_OPTS=-XX:-UseGCTaskAffinity -XX:-BindGCTaskThreadsToCPUs -XX:ParallelGCThreads=1 -XX:ParallelCMSThreads=1
+# ES_HEAP_NEWSIZE # optional override
+# ES_DIRECT_SIZE  # optional override
+CONSUL=consul.svc.{your-account-uuid}.{target-data-center}.cns.joyent.com
