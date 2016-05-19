@@ -9,12 +9,5 @@
       "poll": 10,
       "ttl": 25
     }
-  ],
-  "backends": [
-    {
-      "name": "elasticsearch",
-      "poll": 5,
-      "onChange": "/usr/local/bin/prestart.sh"
-    }
   ]
 }
