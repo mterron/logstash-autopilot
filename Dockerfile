@@ -1,5 +1,4 @@
 FROM alpine:3.3
-
 # Alpine packages
 RUN echo http://dl-6.alpinelinux.org/alpine/v3.3/community >> /etc/apk/repositories &&\
 	apk upgrade --update &&\
@@ -13,12 +12,6 @@ RUN echo http://dl-6.alpinelinux.org/alpine/v3.3/community >> /etc/apk/repositor
 		openssl \
 		su-exec \
 		tzdata
-
-# We don't need to expose these ports in order for other containers on Triton
-# to reach this container in the default networking environment, but if we
-# leave this here then we get the ports as well-known environment variables
-# for purposes of linking.
-EXPOSE 3164 3164/udp 5424 5424/udp 6666 10514 12201 13000 14000 24224 25109
 
 WORKDIR /tmp
 # Add Containerpilot and set its configuration path
@@ -39,19 +32,27 @@ RUN mkdir -p /opt && \
 	mv -f logstash-${LOGSTASH_VERSION}/ /opt/logstash &&\
 	rm -f logstash-${LOGSTASH_VERSION}.tar.gz
 
+# We don't need to expose these ports in order for other containers on Triton
+# to reach this container in the default networking environment, but if we
+# leave this here then we get the ports as well-known environment variables
+# for purposes of linking.
+EXPOSE 3164 3164/udp 5424 5424/udp 6666 10514 12201 13000 14000 24224 25109
+ENV PATH=$PATH:/opt/logstash/bin
+
 # Copy internal CA certificate bundle.
 COPY ca.pem /etc/ssl/private/
 # Create and take ownership over required directories, update CA
 RUN adduser -D -g logstash logstash &&\
 	adduser logstash logstash &&\
 	mkdir -p /opt/logstash/config &&\
-	chown -R logstash:logstash /opt &&\
 	mkdir -p /etc/containerpilot &&\
 	chmod -R g+w /etc/containerpilot &&\
+	logstash-plugin install logstash-input-relp &&\
+	logstash-plugin install logstash-codec-nmap &&\
+	chown -R logstash:logstash /opt &&\
 	chown -R logstash:logstash /etc/containerpilot &&\
 	$(cat /etc/ssl/private/ca.pem >> /etc/ssl/certs/ca-certificates.crt;exit 0)
 
-ENV PATH=$PATH:/opt/logstash/bin
 # Add our configuration files and scripts
 COPY bin/* /usr/local/bin/
 COPY containerpilot.json /etc/containerpilot/containerpilot.json

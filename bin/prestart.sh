@@ -13,17 +13,6 @@ configure() {
 }
 ###################################################################################################
 
-# If we are starting up for the first time, install plugins. 
-# logstash process name is "java"
-if ! (pgrep java >/dev/null 2>&1); then { 
-	log "Installing plugins"
-	logstash-plugin install logstash-input-relp
-	logstash-plugin install logstash-codec-nmap
-	#logstash-plugin update
-	log "plugins installed"
-}
-fi
-
 # Wait till Elasticsearch is available
 log "Waiting for Elasticsearch data node..."
 until (curl -Ls --fail "${CONSUL}/v1/health/service/elasticsearch-data?passing" | jq -e -r '.[0].Service.Address' >/dev/null); do

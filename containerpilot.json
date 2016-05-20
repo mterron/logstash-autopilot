@@ -1,13 +1,70 @@
 {
   "consul": "{{ .CONSUL }}",
   "preStart": "/usr/local/bin/prestart.sh",
+  "stopTimeout": 60,
   "services": [
     {
-      "name": "logstash",
-      "port": 514,
+      "name": "logstash-syslog",
+      "port": 3164,
       "health": "true",
-      "poll": 10,
-      "ttl": 25
+      "poll": 60,
+      "ttl": 90
+    },
+    {
+      "name": "logstash-syslog-rfc5424",
+      "port": 5424,
+      "health": "true",
+      "poll": 60,
+      "ttl": 90
+    },
+    {
+      "name": "logstash-relp",
+      "port": 10514,
+      "health": "true",
+      "poll": 60,
+      "ttl": 90
+    },
+    {
+      "name": "logstash-gelf",
+      "port": 12201,
+      "health": "true",
+      "poll": 60,
+      "ttl": 90
+    },
+    {
+      "name": "logstash-json_lines",
+      "port": 13000,
+      "health": "true",
+      "poll": 60,
+      "ttl": 90
+    },
+    {
+      "name": "logstash-json",
+      "port": 14000,
+      "health": "true",
+      "poll": 60,
+      "ttl": 90
+    },
+    {
+      "name": "logstash-fluent",
+      "port": 24224,
+      "health": "true",
+      "poll": 60,
+      "ttl": 90
+    },
+    {
+      "name": "logstash-beats",
+      "port": 25109,
+      "health": "true",
+      "poll": 60,
+      "ttl": 90
+    },
+    {
+      "name": "logstash-nmap",
+      "port": 6666,
+      "health": "true",
+      "poll": 60,
+      "ttl": 90
     }
   ]
 }
