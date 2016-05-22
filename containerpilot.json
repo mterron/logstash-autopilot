@@ -1,70 +1,66 @@
 {
   "consul": "{{ .CONSUL }}",
+  "logging": {
+    "level": "INFO",
+    "format": "default",
+    "output": "stdout"
+  },
   "preStart": "/usr/local/bin/prestart.sh",
   "stopTimeout": 60,
   "services": [
     {
-      "name": "logstash-syslog",
+      "name": "syslog",
       "port": 3164,
-      "health": "true",
-      "poll": 60,
-      "ttl": 600
+      "poll": 3600,
+      "ttl": 7200
     },
     {
-      "name": "logstash-syslog-rfc5424",
+      "name": "syslog-rfc5424",
       "port": 5424,
-      "health": "true",
-      "poll": 60,
-      "ttl": 600
+      "poll": 3600,
+      "ttl": 7200
     },
     {
-      "name": "logstash-relp",
+      "name": "relp",
       "port": 10514,
-      "health": "true",
-      "poll": 60,
-      "ttl": 600
+      "poll": 3600,
+      "ttl": 7200
     },
     {
-      "name": "logstash-gelf",
+      "name": "gelf",
       "port": 12201,
-      "health": "true",
-      "poll": 60,
-      "ttl": 600
+      "poll": 3600,
+      "ttl": 7200
     },
     {
-      "name": "logstash-json_lines",
+      "name": "logstash-json_line",
       "port": 13000,
-      "health": "true",
-      "poll": 60,
-      "ttl": 600
+      "poll": 3600,
+      "ttl": 7200
     },
     {
       "name": "logstash-json",
       "port": 14000,
-      "health": "true",
-      "poll": 60,
-      "ttl": 600
+      "poll": 3600,
+      "ttl": 7200
     },
     {
-      "name": "logstash-fluent",
+      "name": "fluent",
       "port": 24224,
-      "health": "true",
-      "poll": 60,
-      "ttl": 600
+      "poll": 3600,
+      "ttl": 7200
     },
     {
-      "name": "logstash-beats",
+      "name": "beats",
       "port": 25109,
-      "health": "true",
-      "poll": 60,
-      "ttl": 600
+      "poll": 3600,
+      "ttl": 7200
     },
     {
       "name": "logstash-nmap",
       "port": 6666,
-      "health": "true",
-      "poll": 60,
-      "ttl": 600
+      "poll": 3600,
+      "ttl": 7200
     }
   ]
 }

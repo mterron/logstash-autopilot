@@ -6,9 +6,9 @@ loge() {
     printf "[ERROR] preStart: %s\n" "$@"
 }
 
-# update elasticsearch URL configuration
+# update logstash URL configuration
 configure() {    
-	ES=$(curl -Ls --fail "${CONSUL}/v1/health/service/elasticsearch-data?passing" | jq -e -r '[.[].Service.Address]' | tr -d ' \r\n' | sed 's/",/:9200",/g'| sed 's/"]/:9200"]/')
+	ES=$(curl -Ls --fail "${CONSUL}/v1/health/service/elasticsearch-data?passing" | jq -c -e -r '[.[].Service.Address+":9200"]')
 	log "Elasticsearch data node(s): $ES"
     REPLACEMENT=$(printf 's/hosts\s*=> \[.*\]/hosts\t=>%s/' "$ES")
 	sed -i "$REPLACEMENT" /opt/logstash/config/logstash.conf

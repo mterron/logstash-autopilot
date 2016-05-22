@@ -45,6 +45,7 @@ COPY ca.pem /etc/ssl/private/
 RUN adduser -D -g logstash logstash &&\
 	adduser logstash logstash &&\
 	mkdir -p /opt/logstash/config &&\
+	mkdir -p /opt/logstash/log &&\
 	mkdir -p /etc/containerpilot &&\
 	chmod -R g+w /etc/containerpilot &&\
 	logstash-plugin install logstash-input-relp &&\
@@ -56,7 +57,9 @@ RUN adduser -D -g logstash logstash &&\
 # Add our configuration files and scripts
 COPY bin/* /usr/local/bin/
 COPY containerpilot.json /etc/containerpilot/containerpilot.json
+ONBUILD COPY containerpilot.json /etc/containerpilot/containerpilot.json
 COPY logstash.conf /opt/logstash/config/logstash.conf
+ONBUILD COPY logstash.conf /opt/logstash/config/logstash.conf
 
 USER logstash
 CMD ["/usr/local/bin/startup.sh"]
