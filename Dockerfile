@@ -1,4 +1,5 @@
 FROM alpine:3.3
+
 # Alpine packages
 RUN echo http://dl-6.alpinelinux.org/alpine/v3.3/community >> /etc/apk/repositories &&\
 	apk upgrade --update &&\
@@ -32,10 +33,6 @@ RUN mkdir -p /opt && \
 	mv -f logstash-${LOGSTASH_VERSION}/ /opt/logstash &&\
 	rm -f logstash-${LOGSTASH_VERSION}.tar.gz
 
-# We don't need to expose these ports in order for other containers on Triton
-# to reach this container in the default networking environment, but if we
-# leave this here then we get the ports as well-known environment variables
-# for purposes of linking.
 EXPOSE 3164 3164/udp 5424 5424/udp 6666 10514 12201 13000 14000 24224 25109
 ENV PATH=$PATH:/opt/logstash/bin
 
@@ -57,8 +54,12 @@ RUN adduser -D -g logstash logstash &&\
 # Add our configuration files and scripts
 COPY bin/* /usr/local/bin/
 COPY containerpilot.json /etc/containerpilot/containerpilot.json
-ONBUILD COPY containerpilot.json /etc/containerpilot/containerpilot.json
 COPY logstash.conf /opt/logstash/config/logstash.conf
+
+# If you build on top of this image, please provide this files
+# If you are using an internal CA
+ONBUILD COPY ca.pem /etc/ssl/private/
+ONBUILD COPY containerpilot.json /etc/containerpilot/containerpilot.json
 ONBUILD COPY logstash.conf /opt/logstash/config/logstash.conf
 
 USER logstash
