@@ -11,56 +11,56 @@
     {
       "name": "syslog",
       "port": 3164,
-      "poll": 20,
-      "ttl": 7200
+      "poll": 8,
+      "ttl": 10
     },
     {
       "name": "syslog-rfc5424",
       "port": 5424,
-      "poll": 20,
-      "ttl": 7200
+      "poll": 8,
+      "ttl": 10
     },
     {
       "name": "relp",
       "port": 10514,
-      "poll": 20,
-      "ttl": 7200
+      "poll": 8,
+      "ttl": 10
     },
     {
       "name": "gelf",
       "port": 12201,
-      "poll": 20,
-      "ttl": 7200
+      "poll": 8,
+      "ttl": 10
     },
     {
       "name": "logstash-json_line",
       "port": 13000,
-      "poll": 20,
-      "ttl": 7200
+      "poll": 8,
+      "ttl": 10
     },
     {
       "name": "logstash-json",
       "port": 14000,
-      "poll": 20,
-      "ttl": 7200
+      "poll": 8,
+      "ttl": 10
     },
     {
       "name": "fluent",
       "port": 24224,
-      "poll": 20,
-      "ttl": 7200
+      "poll": 8,
+      "ttl": 10
     },
     {
       "name": "beats",
       "port": 25109,
-      "poll": 20,
-      "ttl": 7200
+      "poll": 8,
+      "ttl": 10
     },
     {
       "name": "logstash-nmap",
       "port": 6666,
-      "poll": 20,
-      "ttl": 7200
+      "poll": 8,
+      "ttl": 10
     }
   ]
 }

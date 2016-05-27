@@ -13,7 +13,30 @@ configure() {
     REPLACEMENT=$(printf 's/hosts\s*=> \[.*\]/hosts\t=>%s/' "$ES")
 	sed -i "$REPLACEMENT" /opt/logstash/config/logstash.conf
 }
-###################################################################################################
+#------------------------------------------------------------------------------
+# Check that CONSUL environment variable exists
+if [[ -z ${CONSUL} ]]; then
+    loge "Missing CONSUL environment variable"
+    exit 1
+fi
+
+# Wait up to 2 minutes for Consul to be available
+log "Waiting for Consul availability..."
+n=0
+until [ $n -ge 120 ]; do
+    until (curl -fsL --connect-timeout 1 "${CONSUL}/v1/status/leader" &> /dev/null); do
+        sleep 2
+        n=$((n+2))
+    done
+    break
+done
+if [ $n -ge 120 ]; then {
+    loge "Consul unavailable, aborting"
+    exit 1
+}
+fi
+
+log "Consul is now available [${n}s], starting up Logstash"
 # Wait till Elasticsearch is available
 log "Waiting for Elasticsearch data node..."
 until (curl -Ls --fail "${CONSUL}/v1/health/service/elasticsearch-data?passing" | jq -e -r '.[0].Service.Address' >/dev/null); do
