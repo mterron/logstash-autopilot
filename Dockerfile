@@ -63,4 +63,4 @@ ONBUILD COPY containerpilot.json /etc/containerpilot/containerpilot.json
 ONBUILD COPY logstash.conf /opt/logstash/config/logstash.conf
 
 USER logstash
-CMD ["/opt/containerpilot/containerpilot","/opt/logstash/bin/logstash agent --allow-env -f /opt/logstash/config/logstash.conf"]
+CMD ["/opt/containerpilot/containerpilot","/opt/logstash/bin/logstash","agent","--allow-env","-f","/opt/logstash/config/logstash.conf"]
