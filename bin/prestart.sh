@@ -37,7 +37,7 @@ log "Consul is now available [${n}s], starting up Logstash"
 # Wait till Elasticsearch is available
 log "Waiting for Elasticsearch data node..."
 until (curl -Ls --fail "${CONSUL}/v1/health/service/elasticsearch-data?passing" | jq -e -r '.[0].Service.Address' >/dev/null); do
-    sleep 10
+    sleep 2
 done
 
 log "Elasticsearch is now available, configuring Logstash"
