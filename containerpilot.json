@@ -1,5 +1,5 @@
 {
-  "consul": "{{ .CONSUL }}",
+  "consul": "{{ .CONSUL_HTTP_ADDR }}",
   "logging": {
     "level": "INFO",
     "format": "default",
