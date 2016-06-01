@@ -1,9 +1,8 @@
 FROM alpine:3.3
 
 # Alpine packages
-RUN echo http://dl-6.alpinelinux.org/alpine/v3.3/community >> /etc/apk/repositories &&\
-	apk upgrade --update &&\
-	apk -f -q --no-progress --no-cache add \
+RUN apk -f -q --progress --no-cache upgrade &&\
+	apk -f -q --progress --no-cache add \
 		curl \
 		bash \
 		ca-certificates \
@@ -16,7 +15,7 @@ RUN echo http://dl-6.alpinelinux.org/alpine/v3.3/community >> /etc/apk/repositor
 
 WORKDIR /tmp
 # Add Containerpilot and set its configuration path
-ENV CONTAINERPILOT_VERSION=2.1.2 \
+ENV CONTAINERPILOT_VERSION=2.1.3 \
 	CONTAINERPILOT=file:///etc/containerpilot/containerpilot.json
 ADD https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz /tmp/
 ADD	https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.sha1.txt /tmp/
@@ -38,6 +37,8 @@ ENV PATH=$PATH:/opt/logstash/bin
 
 # Copy internal CA certificate bundle.
 COPY ca.pem /etc/ssl/private/
+# Client certificate to talk to Consul
+COPY client_certificate.crt /etc/tls/
 # Create and take ownership over required directories, update CA
 RUN adduser -D -g logstash logstash &&\
 	adduser logstash logstash &&\
@@ -49,7 +50,7 @@ RUN adduser -D -g logstash logstash &&\
 	logstash-plugin install logstash-codec-nmap &&\
 	chown -R logstash:logstash /opt &&\
 	chown -R logstash:logstash /etc/containerpilot &&\
-	$(cat /etc/ssl/private/ca.pem >> /etc/ssl/certs/ca-certificates.crt;exit 0)
+	cat /etc/ssl/private/ca.pem >> /etc/ssl/certs/ca-certificates.crt
 
 # Add our configuration files and scripts
 COPY bin/* /usr/local/bin/

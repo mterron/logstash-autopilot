@@ -23,7 +23,7 @@ fi
 # Wait up to 2 minutes for Consul to be available
 log "Waiting for Consul availability..."
 n=0
-until [ $n -ge 120 ]||(curl -fsL --connect-timeout 1 "${CONSUL_HTTP_ADDR}/v1/status/leader" &> /dev/null); do
+until [ $n -ge 120 ]||(curl -E /etc/tls/client_certificate.crt -fsL --connect-timeout 1 "${CONSUL_HTTP_ADDR}/v1/status/leader" &> /dev/null); do
 	sleep 2
 	n=$((n+2))
 done
@@ -36,7 +36,7 @@ fi
 log "Consul is now available [${n}s], starting up Logstash"
 # Wait till Elasticsearch is available
 log "Waiting for Elasticsearch data node..."
-until (curl -Ls --fail "${CONSUL_HTTP_ADDR}/v1/health/service/elasticsearch-data?passing" | jq -e -r '.[0].Service.Address' >/dev/null); do
+until (curl -E /etc/tls/client_certificate.crt -Ls --fail "${CONSUL_HTTP_ADDR}/v1/health/service/elasticsearch-data?passing" | jq -e -r '.[0].Service.Address' >/dev/null); do
 	sleep 2
 done
 
