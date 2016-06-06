@@ -1,0 +1,3 @@
+#!/usr/bin/with-contenv /bin/ash
+touch /etc/hosts.links
+exec dnsmasq --user=dnsmasq --group=dnsmasq --listen-address=127.0.0.1 -2 --cache-size=1024 --no-negcache --expand-hosts --no-daemon --server=/consul/127.0.0.1#8600 --rev-server=172.16.0.0/12,127.0.0.1#8600

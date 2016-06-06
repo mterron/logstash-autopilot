@@ -1,0 +1,2 @@
+#!/usr/bin/with-contenv /bin/ash
+exec s6-setuidgid logstash /opt/containerpilot/containerpilot /opt/logstash/bin/logstash agent --allow-env -f /opt/logstash/config/logstash.conf

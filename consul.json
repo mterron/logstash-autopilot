@@ -1,0 +1,13 @@
+{
+"data_dir": "/data",
+"disable_update_check": true,
+"disable_remote_exec": true,
+"log_level": "ERR",
+
+"dns_config": {
+	"only_passing": true,
+	"enable_truncate": true,
+	"allow_stale": true,
+	"max_stale": "3s"
+}
+}
