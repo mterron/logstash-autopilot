@@ -1,17 +1,24 @@
 #!/usr/bin/with-contenv /bin/ash
 log() {
-	printf "%s\n" "$@"|awk '{print strftime("%FT%T%z",systime()),"[INFO] consul:",$0}'
+	printf "%s\n" "$@"|awk -F· '{print strftime("%FT%T%z",systime()),"["$1"] consul:",$2}'
+}
+logi() {
+	log "INFO·$@"
 }
 loge() {
-	printf "%s\n" "$@"|awk '{print strftime("%FT%T%z",systime()),"[ERROR] consul:",$0}'
+	log "ERR·$@"
 }
 ###################################################################################################
+# Wait for Consul cluster availability before starting the Consul agent
+until (curl -E /etc/tls/client_certificate.crt -fsL --connect-timeout 1 "https://${CONSUL_DNS_NAME}:8501/v1/status/leader" &> /dev/null); do
+	sleep 2
+done
 if [ -e /data/raft/raft.db ]; then
-	log "Starting up Consul"
+	logi "Starting up Consul agent"
 	unset CONSUL_ENCRYPT_TOKEN
 	exec s6-setuidgid consul /bin/consul agent -config-dir=/etc/consul/ -dc="$CONSUL_DC_NAME" -retry-join="$CONSUL_BOOTSTRAP_HOST" -retry-join="$CONSUL_DNS_NAME"
 else
-	log "Starting up Consul for the first time, using CONSUL_ENCRYPT_TOKEN & BOOTSTRAP_HOST environment variables"
+	logi "Starting up Consul agent for the first time, using CONSUL_ENCRYPT_TOKEN & BOOTSTRAP_HOST environment variables"
 	if [ "$CONSUL_ENCRYPT_TOKEN" ]; then
 		exec s6-setuidgid consul /bin/consul agent -config-dir=/etc/consul/ -dc="$CONSUL_DC_NAME" -retry-join="$CONSUL_DNS_NAME" -encrypt="$CONSUL_ENCRYPT_TOKEN"
 	else

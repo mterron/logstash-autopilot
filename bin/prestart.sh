@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/ash
 log() {
 	printf "[INFO] preStart: %s\n" "$@"
 }
 loge() {
-	printf "[ERROR] preStart: %s\n" "$@"
+	printf "[ERR] preStart: %s\n" "$@"
 }
 
 # update logstash URL configuration

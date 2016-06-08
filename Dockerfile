@@ -67,7 +67,7 @@ COPY ca.pem /etc/ssl/private/
 # Note that this option assumes a "certificate" file that is the private key 
 # and the private certificate concatenated! See --cert and --key to specify 
 # them independently.
-COPY client_certificate.crt /etc/tls/
+COPY client_certificate.* /etc/tls/
 # Add our configuration files and scripts
 COPY bin/* /usr/local/bin/
 COPY containerpilot.json /etc/containerpilot/containerpilot.json
