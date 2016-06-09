@@ -1,0 +1,193 @@
+version: "2"
+# Elasticsearch stack designed for container-native deployment
+# using the Autopilot pattern
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+
+services:
+  # ----------------------------------------------------------------------
+  # Consul as a service discovery tier
+  consul:
+    image: mterron/consul-betterscratch
+    labels:
+      - triton.cns.services=consul
+    restart: always
+    mem_limit: 128m
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETGID
+      - SETUID
+      - SYS_TIME
+    expose:
+      - 8300
+      - 8301
+      - 8302
+      - 8400
+      - 8500
+    ports:
+      - 8501
+    env_file: _env_consul
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "udp://192.168.99.100:5424"
+        syslog-format: "rfc5424"
+  # ----------------------------------------------------------------------
+  # Load balancer
+  fabio:
+    image: mterron/fabiolb
+    restart: always
+    mem_limit: 128m
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETGID
+      - SETUID
+      - SYS_TIME
+    ports:
+      - "9999:9999"
+      - "9998:9998"
+    dns:
+      - 172.21.0.2
+    dns_search:
+      - service.consul
+    env_file: _env_consul
+    depends_on:
+      - consul
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "udp://192.168.99.100:5424"
+        syslog-format: "rfc5424"  
+  # ----------------------------------------------------------------------
+  # Elasticsearch
+  # The master-only node serves as the coordinator of the cluster only
+  elasticsearch-master:
+    extends:
+      file: ES.yml
+      service: elasticsearch
+    labels:
+      - triton.cns.services=elasticsearch-master
+    depends_on:
+      - consul
+    environment:
+      - ES_SERVICE_NAME=elasticsearch-master
+      - ES_NODE_MASTER=true
+      - ES_NODE_DATA=false
+  # ----------------------------------------------------------------------
+  # Elasticsearch
+  # Master+Data node
+  elasticsearch:
+    extends:
+      file: ES.yml
+      service: elasticsearch
+    labels:
+      - triton.cns.services=elasticsearch
+    depends_on:
+      - consul
+  # ----------------------------------------------------------------------
+  # Data nodes hold data and perform data related operations such as CRUD, 
+  # search, and aggregations.
+  elasticsearch-data:
+    extends:
+      file: ES.yml
+      service: elasticsearch
+    labels:
+      - triton.cns.services=elasticsearch-data
+    depends_on:
+      - elasticsearch-master
+    environment:
+      - ES_SERVICE_NAME=elasticsearch-data
+      - ES_NODE_MASTER=false
+      - ES_NODE_DATA=true
+  # ----------------------------------------------------------------------
+  # Client node behaves as a “smart router” and is used to forward 
+  # cluster-level requests to the master node and data-related 
+  # requests (such as search) to the appropriate data nodes.
+  # Starting with ES 5 another function is work as dedicated ingest nodes
+  # elasticsearch-client:
+  #   extends:
+  #     file: ES.yml
+  #     service: elasticsearch
+  #   labels:
+  #     - triton.cns.services=elasticsearch-client
+  #   depends_on:
+  #     - elasticsearch-master
+  #   environment:
+  #     - ES_SERVICE_NAME=elasticsearch-client
+  #     - ES_NODE_MASTER=false
+  #     - ES_NODE_DATA=false
+  # ----------------------------------------------------------------------
+  
+  # The Logstash container 
+  # Works as a centralised logging platform
+  # Is the target of Docker log drivers in this composition
+  logstash:
+    image: mterron/logstash-autopilot
+    mem_limit: 256m
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETGID
+      - SETUID
+      - SYS_TIME
+    restart: always
+    labels:
+      - triton.cns.services=logstash
+    depends_on:
+      - elasticsearch-master
+    ports:  
+      - "3164:3164"
+      - "3164/udp"
+      - "5424:5424"
+      - "5424:5424/udp"
+      - "6666:6666"
+      - "10514:10514"
+      - "12201:12201/udp"
+      - "13000:13000"
+      - "13000:13000/udp"
+      - "14000:14000"
+      - "14000:14000/udp"
+      - "24224:24224"
+      - "25109:25109"
+    dns:
+      - 172.21.0.2
+    dns_search:
+      - service.consul
+    env_file: _env_logstash
+  # ----------------------------------------------------------------------
+  # The Kibana container
+  kibana:
+    image: mterron/kibana-autopilot
+    mem_limit: 256m
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETGID
+      - SETUID
+      - SYS_TIME
+    restart: always
+    labels:
+      - triton.cns.services=kibana
+    depends_on:
+      - logstash
+    expose:
+      - 5601
+    dns:
+      - 172.21.0.2
+    dns_search:
+      - service.consul
+    env_file: _env_kibana
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "udp://192.168.99.100:5424"
+        syslog-format: "rfc5424"

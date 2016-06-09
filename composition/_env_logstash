@@ -1,0 +1,19 @@
+# Use your own TZ
+TZ=Pacific/Auckland
+
+# Consul
+CONSUL_HTTP_ADDR=http://127.0.0.1:8500
+CONSUL_HTTP_TOKEN=demo_master_token
+CONSUL_DC_NAME=demodc
+CONSUL_DNS_NAME=consul.service.consul
+# Generate your own encryption token!!!!
+CONSUL_ENCRYPT_TOKEN=ISm6AS2DDICjkMdzqjZDPw==
+CONSUL_BOOTSTRAP_HOST=consul
+
+# Logstash
+# Size for the -Xmx${LS_HEAP_SIZE} maximum Java heap size option, default is "1g"
+# set to 50% of mem_limit, but no more than 31g
+LS_HEAP_SIZE=128m
+# Set the number of threads we want based on the number of CPU shares
+# that we'll get for this size container
+LS_JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom -XX:-UseGCTaskAffinity -XX:-BindGCTaskThreadsToCPUs -XX:ParallelGCThreads=1 -XX:ParallelCMSThreads=1

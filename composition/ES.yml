@@ -1,0 +1,42 @@
+version: "2"
+# Elasticsearch stack designed for container-native deployment
+# using the Autopilot pattern
+
+services:
+  # ---------------------------------------------------
+  # This common service definition is the default for nodes that both store
+  # data and act as potential master nodes. It also serves as a template for
+  # master-only, data-only and client ES nodes.
+  elasticsearch:
+    image: mterron/elasticsearch-autopilot
+    labels:
+      - triton.cns.services=elasticsearch-master
+    mem_limit: 256m
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETGID
+      - SETUID
+      - SYS_TIME
+    restart: always
+    ulimits:
+      memlock: 9223372036854775807
+    expose:
+      - 8301
+      - 9200
+      - 9300
+    dns:
+      - 172.21.0.2
+    dns_search:
+      - service.consul
+    env_file: _env_elasticsearch
+    environment:
+      - ES_SERVICE_NAME=elasticsearch-master
+      - ES_NODE_MASTER=true
+      - ES_NODE_DATA=true
+    # logging:
+    #   driver: "syslog"
+    #   options:
+    #     syslog-address: "udp://192.168.99.100:5424"
+    #     syslog-format: "rfc5424"
