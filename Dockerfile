@@ -12,7 +12,7 @@ RUN apk -f -q --progress --no-cache upgrade &&\
 		openssl \
 		tzdata 
 
-ENV CONTAINERPILOT_VERSION=2.1.3 \
+ENV CONTAINERPILOT_VERSION=2.2.0 \
 	CONTAINERPILOT=file:///etc/containerpilot/containerpilot.json \
 	CONSUL_VERSION=0.6.4
 

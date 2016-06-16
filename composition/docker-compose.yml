@@ -61,10 +61,9 @@ services:
     depends_on:
       - consul
     logging:
-      driver: "syslog"
+      driver: "gelf"
       options:
-        syslog-address: "udp://192.168.99.100:5424"
-        syslog-format: "rfc5424"  
+        gelf-address: "udp://192.168.99.100:12201"
   # ----------------------------------------------------------------------
   # Elasticsearch
   # The master-only node serves as the coordinator of the cluster only
@@ -187,7 +186,7 @@ services:
       - service.consul
     env_file: _env_kibana
     logging:
-      driver: "syslog"
+      driver: "fluentd"
       options:
-        syslog-address: "udp://192.168.99.100:5424"
-        syslog-format: "rfc5424"
+        fluentd-address: "192.168.99.100:24224"
+        fluentd-async-connect: "true"
