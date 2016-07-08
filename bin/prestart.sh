@@ -10,7 +10,7 @@ loge() {
 configure() {
 	ES=$(curl -Ls --fail "${CONSUL_HTTP_ADDR}/v1/health/service/elasticsearch-data?passing" | jq -c -e -r '[.[].Service.Address+":9200"]')
 	log "Elasticsearch data node(s): $ES"
-	REPLACEMENT=$(printf 's/hosts\s*=> \[.*\]/hosts\t=>%s/' "$ES")
+	REPLACEMENT="s/hosts\s*=> \[.*\]/hosts\t=>${ES}/"
 	sed -i "$REPLACEMENT" /opt/logstash/config/logstash.conf
 }
 #------------------------------------------------------------------------------
