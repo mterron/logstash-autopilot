@@ -14,11 +14,12 @@ RUN apk -f -q --progress --no-cache upgrade &&\
 
 ENV CONTAINERPILOT_VERSION=2.2.0 \
 	CONTAINERPILOT=file:///etc/containerpilot/containerpilot.json \
-	CONSUL_VERSION=0.6.4
+	CONSUL_VERSION=0.6.4 \
+	S6_VERSION=1.18.1.3
 
 WORKDIR /tmp
 RUN echo "Downloading S6 Overlay" &&\
-	curl -LO# https://github.com/just-containers/s6-overlay/releases/download/v1.17.2.0/s6-overlay-amd64.tar.gz &&\
+	curl -LO# https://github.com/just-containers/s6-overlay/releases/download/v${S6_VERSION}/s6-overlay-amd64.tar.gz &&\
 	gunzip -c /tmp/s6-overlay-amd64.tar.gz | tar -xf - -C / &&\
 	rm -f s6-overlay-amd64.tar.gz &&\
 	echo "Downloading Containerpilot" &&\
@@ -50,7 +51,7 @@ RUN echo "Downloading S6 Overlay" &&\
 	chown -R consul: /etc/consul/ &&\
 	chmod +x /bin/*
 
-ENV	LOGSTASH_VERSION=2.3.2 \
+ENV	LOGSTASH_VERSION=2.3.3 \
 	PATH=$PATH:/opt/logstash/bin
 
 EXPOSE 3164 3164/udp 5424 5424/udp 6666 10514 12201 13000 14000 24224 25109 8301
