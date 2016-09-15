@@ -16,11 +16,11 @@ done
 if [ -e /data/raft/raft.db ]; then
 	logi "Starting up Consul agent"
 	unset CONSUL_ENCRYPT_TOKEN
-	exec s6-setuidgid consul /bin/consul agent -config-dir=/etc/consul/ -dc="$CONSUL_DC_NAME" -rejoin -retry-join="$CONSUL_DNS_NAME"
+	exec s6-setuidgid consul /bin/consul agent -config-dir=/etc/consul/ -datacenter="$CONSUL_DC_NAME" -rejoin -retry-join="$CONSUL_DNS_NAME"
 else
 	logi "Starting up Consul agent for the first time, using CONSUL_ENCRYPT_TOKEN & BOOTSTRAP_HOST environment variables"
 	if [ "$CONSUL_ENCRYPT_TOKEN" ]; then
-		exec s6-setuidgid consul /bin/consul agent -config-dir=/etc/consul/ -dc="$CONSUL_DC_NAME" -retry-join="$CONSUL_DNS_NAME" -encrypt="$CONSUL_ENCRYPT_TOKEN"
+		exec s6-setuidgid consul /bin/consul agent -config-dir=/etc/consul/ -datacenter="$CONSUL_DC_NAME" -retry-join="$CONSUL_DNS_NAME" -encrypt="$CONSUL_ENCRYPT_TOKEN"
 	else
 		loge "CONSUL_ENCRYPT_TOKEN not set, aborting"
 		exit 1
