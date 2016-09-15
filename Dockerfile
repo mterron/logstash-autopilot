@@ -12,17 +12,17 @@ RUN apk -f -q --progress --no-cache upgrade &&\
 		openssl \
 		tzdata 
 
-ENV CONTAINERPILOT_VERSION=2.2.0 \
+ENV CONTAINERPILOT_VERSION=2.4.1 \
 	CONTAINERPILOT=file:///etc/containerpilot/containerpilot.json \
-	CONSUL_VERSION=0.6.4 \
+	CONSUL_VERSION=0.7.0 \
 	S6_VERSION=1.18.1.3
 
 WORKDIR /tmp
-RUN echo "Downloading S6 Overlay" &&\
-	curl -LO# https://github.com/just-containers/s6-overlay/releases/download/v${S6_VERSION}/s6-overlay-amd64.tar.gz &&\
-	gunzip -c /tmp/s6-overlay-amd64.tar.gz | tar -xf - -C / &&\
-	rm -f s6-overlay-amd64.tar.gz &&\
-	echo "Downloading Containerpilot" &&\
+# RUN echo "Downloading S6 Overlay" &&\
+# 	curl -LO# https://github.com/just-containers/s6-overlay/releases/download/v${S6_VERSION}/s6-overlay-amd64.tar.gz &&\
+# 	gunzip -c /tmp/s6-overlay-amd64.tar.gz | tar -xf - -C / &&\
+# 	rm -f s6-overlay-amd64.tar.gz &&\
+RUN	echo "Downloading Containerpilot" &&\
 	curl -LO# https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz &&\
 	echo "Downloading Containerpilot checksums" &&\
 	curl -LO# https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.sha1.txt &&\
@@ -51,7 +51,7 @@ RUN echo "Downloading S6 Overlay" &&\
 	chown -R consul: /etc/consul/ &&\
 	chmod +x /bin/*
 
-ENV	LOGSTASH_VERSION=2.3.3 \
+ENV	LOGSTASH_VERSION=2.4.0 \
 	PATH=$PATH:/opt/logstash/bin
 
 EXPOSE 3164 3164/udp 5424 5424/udp 6666 10514 12201 13000 14000 24224 25109 8301
@@ -85,7 +85,7 @@ ONBUILD COPY logstash.conf /opt/logstash/config/logstash.conf
 
 # Download Logstash release
 RUN	echo "Downloading Logstash" &&\
-	curl -LO# https://download.elastic.co/logstash/logstash/logstash-${LOGSTASH_VERSION}.tar.gz &&\
+	curl -LO# https://download.elastic.co/logstash/logstash/logstash-all-plugins-${LOGSTASH_VERSION}.tar.gz &&\
 	mkdir -p /opt/logstash/ && \
 	tar xzf /tmp/logstash-${LOGSTASH_VERSION}.tar.gz &&\
 	mv logstash-${LOGSTASH_VERSION}/* /opt/logstash/ &&\
@@ -97,8 +97,6 @@ RUN	echo "Downloading Logstash" &&\
 	mkdir -p /opt/logstash/log &&\
 	mkdir -p /etc/containerpilot &&\
 	chmod -R g+w /etc/containerpilot &&\
-	logstash-plugin install logstash-input-relp &&\
-	logstash-plugin install logstash-codec-nmap &&\
 	chown -R logstash:logstash /opt &&\
 	chown -R logstash:logstash /etc/containerpilot &&\
 	cat /etc/ssl/private/ca.pem >> /etc/ssl/certs/ca-certificates.crt
