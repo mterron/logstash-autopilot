@@ -87,7 +87,7 @@ ONBUILD COPY logstash.conf /opt/logstash/config/logstash.conf
 RUN	echo "Downloading Logstash" &&\
 	curl -LO# https://download.elastic.co/logstash/logstash/logstash-all-plugins-${LOGSTASH_VERSION}.tar.gz &&\
 	mkdir -p /opt/logstash/ && \
-	tar xzf /tmp/logstash-${LOGSTASH_VERSION}.tar.gz &&\
+	tar xzf /tmp/logstash-all-plugins-${LOGSTASH_VERSION}.tar.gz &&\
 	mv logstash-${LOGSTASH_VERSION}/* /opt/logstash/ &&\
 	rm -rf /tmp/* &&\
 # Create and take ownership over required directories, update CA
