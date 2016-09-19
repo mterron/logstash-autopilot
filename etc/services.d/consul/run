@@ -9,6 +9,16 @@ loge() {
 	log "ERR·$@"
 }
 ###################################################################################################
+# ACL Datacenter configuration
+if [ -z "$CONSUL_ACL_DC" ]; then
+	logi "ACL Datacenter not defined, defaulting to $CONSUL_DC_NAME"
+	CONSUL_ACL_DC=$CONSUL_DC_NAME
+fi
+CONSUL_ACL_DC=$(echo "$CONSUL_ACL_DC" | tr 'A-Z' 'a-z')
+REPLACEMENT_ACL_DATACENTER="s/\"acl_datacenter\": .*/\"acl_datacenter\": \"${CONSUL_ACL_DC}\",/"
+
+s6-setuidgid consul sed -i "$REPLACEMENT_ACL_DATACENTER" /etc/consul/consul.json
+
 # Wait for Consul cluster availability before starting the Consul agent
 until (curl -E /etc/tls/client_certificate.crt -fsL --connect-timeout 1 "https://${CONSUL_DNS_NAME}:8501/v1/status/leader" &> /dev/null); do
 	sleep 2

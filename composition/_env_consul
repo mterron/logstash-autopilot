@@ -5,7 +5,7 @@ TZ=Pacific/Auckland
 CONSUL_HTTP_ADDR=https://consul.service.consul:8501
 # If running on Joyent Triton:
 #CONSUL_HTTP_ADDR=http://consul.svc.{your-account-uuid}.{target-data-center}.cns.joyent.com
-CONSUL_HTTP_TOKEN=demo_master_token
+CONSUL_ACL_MASTER_TOKEN=demo_master_token
 CONSUL_DC_NAME=demodc
 CONSUL_DNS_NAME=consul.service.consul
 # Generate your own encryption token!!!!
