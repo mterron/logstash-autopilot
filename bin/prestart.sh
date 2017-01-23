@@ -11,7 +11,7 @@ configure() {
 	ES=$(curl -Ls --fail "${CONSUL_HTTP_ADDR}/v1/health/service/elasticsearch-data?passing" | jq -c -e -r '[.[].Service.Address+":9200"]')
 	log "Elasticsearch data node(s): $ES"
 	REPLACEMENT="s/hosts\s*=> \[.*\]/hosts\t=>${ES}/"
-	sed -i "$REPLACEMENT" /opt/logstash/config/logstash.conf
+	sed -i "$REPLACEMENT" /usr/share/logstash/config/logstash.conf
 }
 #------------------------------------------------------------------------------
 # Check that CONSUL_HTTP_ADDR environment variable exists
@@ -42,7 +42,7 @@ done
 
 log "Elasticsearch is now available, configuring Logstash"
 configure
-# if logstash -t -f /opt/logstash/config/logstash.conf; then
+# if logstash -t -f /usr/share/logstash/config/logstash.conf; then
 #     exit 0
 # else
 #     loge "Invalid Logstash configuration file"
