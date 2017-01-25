@@ -12,10 +12,9 @@ CONSUL_BOOTSTRAP_HOST=consul
 
 # Elasticsearch
 # set to 50% of mem_limit, but no more than 31g
-ES_HEAP_SIZE=128m
 # Set the number of threads we want based on the number of CPU shares
 # that we'll get for this size container
-ES_JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom -XX:-UseGCTaskAffinity -XX:-BindGCTaskThreadsToCPUs -XX:ParallelGCThreads=1 -XX:ParallelCMSThreads=1
+ES_JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom -XX:-UseGCTaskAffinity -XX:-BindGCTaskThreadsToCPUs -XX:ParallelGCThreads=1 -XX:ParallelCMSThreads=1 -Xms128m -Xmx128m
 # ES_HEAP_NEWSIZE # optional override
 # ES_DIRECT_SIZE  # optional override
 ES_CLUSTER_NAME=ESDEMO
